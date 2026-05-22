@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Libook - Book</title>
+
+<style>
+body {
+  font-family: serif;
+  background: #f5f1e6;
+  padding: 20px;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  border: 2px solid black;
+  padding: 20px;
+  background: white;
+}
+
+img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border: 1px solid black;
+}
+
+a {
+  display: inline-block;
+  margin-top: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <img id="image">
+  <h1 id="title"></h1>
+  <p id="author"></p>
+  <p id="desc"></p>
+  <p id="genres"></p>
+
+  <a href="index.html">⬅ Back</a>
+</div>
+
+<script>
+const BIN_ID = "6a0fc1ebee5a733b12fc9522";
+const API_KEY = "$2a$10$QvJnLiGvVrc6k6ds.TiRNegZHNuZd1RYpQDEb6OXRuoPRh3kuEtRC";
+
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
+async function loadBook() {
+  const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+    headers: { "X-Master-Key": API_KEY }
+  });
+
+  const data = (await res.json()).record;
+  const book = data.books.find(b => b.id == id);
+
+  document.getElementById("title").innerText = book.title;
+  document.getElementById("author").innerText = book.author;
+  document.getElementById("desc").innerText = book.description;
+  document.getElementById("genres").innerText = book.genres.join(", ");
+  document.getElementById("image").src = book.image;
+}
+
+loadBook();
+</script>
+
+</body>
+</html>
