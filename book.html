@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Libook - Book</title>
+<title>Libook</title>
 
 <style>
 body {
@@ -12,7 +12,7 @@ body {
 }
 
 .container {
-  max-width: 600px;
+  max-width: 700px;
   margin: auto;
   border: 2px solid black;
   padding: 20px;
@@ -21,20 +21,54 @@ body {
 
 img {
   width: 100%;
-  height: 300px;
+  height: 350px;
   object-fit: cover;
   border: 1px solid black;
 }
 
-a {
-  display: inline-block;
+.back {
   margin-top: 20px;
+  display: inline-block;
 }
 </style>
 </head>
 
 <body>
 
+<div class="container">
+  <img id="img">
+  <h1 id="title"></h1>
+  <p id="author"></p>
+  <p id="desc"></p>
+  <p id="genres"></p>
+
+  <a href="index.html" class="back">⬅ Back</a>
+</div>
+
+<script>
+const BIN_ID = "6a0fc1ebee5a733b12fc9522";
+const API_KEY = "$2a$10$QvJnLiGvVrc6k6ds.TiRNegZHNuZd1RYpQDEb6OXRuoPRh3kuEtRC";
+
+const id = new URLSearchParams(location.search).get("id");
+
+(async ()=>{
+  const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`,{
+    headers:{"X-Master-Key":API_KEY}
+  });
+
+  const data = (await res.json()).record;
+  const b = data.books.find(x=>x.id==id);
+
+  title.innerText = b.title;
+  author.innerText = b.author;
+  desc.innerText = b.description;
+  genres.innerText = b.genres.join(", ");
+  img.src = b.image;
+})();
+</script>
+
+</body>
+</html>
 <div class="container">
   <img id="image">
   <h1 id="title"></h1>
