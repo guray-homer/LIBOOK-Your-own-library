@@ -9,51 +9,40 @@
 
 <style>
 
-/* 🌙 THEME */
+/* 🌍 BASE */
 body {
   margin: 0;
   font-family: 'EB Garamond', serif;
-  background: linear-gradient(#fdf6e3, #f1e4c6);
-  transition: 0.4s;
+  background: radial-gradient(circle, #fdf6e3, #efe2c3);
+  color: #2b2b2b;
+  overflow-x: hidden;
 }
 
-/* Dark mode */
-body.dark {
-  background: #1a1a1a;
-  color: #eee;
-}
-
-/* 📜 Main paper */
+/* 📜 PAPER */
 .container {
   max-width: 1100px;
   margin: auto;
   padding: 20px;
-  background: #fffdf7;
-  box-shadow: 0 0 50px rgba(0,0,0,0.25);
-  transition: 0.4s;
+  background: rgba(255, 253, 245, 0.95);
+  box-shadow: 0 0 60px rgba(0,0,0,0.2);
+  border-radius: 10px;
 }
 
-body.dark .container {
-  background: #2a2a2a;
-}
-
-/* 📖 Header */
+/* 📖 HEADER */
 h1 {
   text-align: center;
   font-family: 'Cinzel';
   letter-spacing: 3px;
+  margin-bottom: 5px;
 }
 
-/* 🌙 Toggle */
-.toggle {
-  position: fixed;
-  top: 15px;
-  right: 15px;
-  cursor: pointer;
-  font-size: 20px;
+.subtitle {
+  text-align: center;
+  font-style: italic;
+  opacity: 0.7;
 }
 
-/* 🔍 Search */
+/* 🔍 SEARCH */
 .search {
   width: 100%;
   padding: 10px;
@@ -62,97 +51,101 @@ h1 {
   background: transparent;
 }
 
-/* 🎨 Genres */
+/* 🎨 GENRES */
 .genre-bar {
   display: flex;
-  gap: 10px;
   overflow-x: auto;
+  gap: 10px;
+  padding-bottom: 10px;
 }
 
 .genre {
   border: 1px solid #c8b68a;
-  padding: 5px 12px;
+  padding: 6px 14px;
   cursor: pointer;
+  border-radius: 20px;
+  transition: 0.2s;
 }
 
 .genre.active {
-  background: black;
+  background: #2b2b2b;
   color: white;
 }
 
-/* 📚 Bookshelf illusion */
+/* 📚 BOOK GRID */
 .books {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 25px;
-  margin-top: 20px;
+  gap: 20px;
 }
 
 .book {
-  background: #fff;
-  border: 1px solid #d8cba5;
+  background: white;
+  border: 1px solid #e0d3a8;
   padding: 10px;
-  transform: perspective(600px) rotateY(0deg);
   transition: 0.3s;
+  border-radius: 6px;
 }
 
 .book:hover {
-  transform: perspective(600px) rotateY(-8deg) scale(1.05);
+  transform: translateY(-8px) scale(1.03);
 }
 
-/* Cover */
 .book img {
   width: 100%;
   height: 220px;
   object-fit: cover;
+  border-radius: 4px;
 }
 
-/* Actions */
+/* ACTIONS */
 .actions {
   display: flex;
   justify-content: space-between;
   font-size: 13px;
 }
 
-/* ✨ Floating button */
+/* ➕ BUTTON */
 .add-btn {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: black;
+  background: #2b2b2b;
   color: white;
   width: 60px;
   height: 60px;
-  font-size: 30px;
+  font-size: 28px;
   border-radius: 50%;
   border: none;
   cursor: pointer;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
 }
 
-/* 🪟 Modal */
+/* 🪟 MODAL */
 .modal {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.4);
 }
 
 .modal-content {
-  background: #fffdf7;
-  max-width: 400px;
-  margin: 8% auto;
+  background: #fffdf5;
+  max-width: 420px;
+  margin: 5% auto;
   padding: 20px;
-  border: 1px solid #c8b68a;
-  animation: openBook 0.4s ease;
+  border-radius: 12px;
+  animation: pop 0.4s ease;
 }
 
-/* 📖 Opening animation */
-@keyframes openBook {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
+/* ✨ animation */
+@keyframes pop {
+  from { transform: scale(0.6) translateY(40px); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
-/* Inputs */
+/* ✏️ INPUT */
 input, textarea {
   width: 100%;
   border: none;
@@ -161,9 +154,28 @@ input, textarea {
   background: transparent;
 }
 
-/* 📱 Responsive */
+/* 🎨 GENRE PICKER */
+.genre-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.genre-chip {
+  padding: 5px 10px;
+  border: 1px solid #c8b68a;
+  cursor: pointer;
+  border-radius: 20px;
+}
+
+.genre-chip.selected {
+  background: black;
+  color: white;
+}
+
+/* 📱 MOBILE */
 @media(max-width:600px){
-  h1 { font-size: 28px; }
+  .book img { height: 180px; }
 }
 
 </style>
@@ -171,10 +183,9 @@ input, textarea {
 
 <body>
 
-<div class="toggle" onclick="toggleTheme()">🌙</div>
-
 <div class="container">
   <h1>📖 Libook</h1>
+  <div class="subtitle">A timeless digital library</div>
 
   <input class="search" id="search" placeholder="Search books...">
 
@@ -185,15 +196,19 @@ input, textarea {
 
 <button class="add-btn" onclick="openModal()">+</button>
 
-<!-- Modal -->
+<!-- MODAL -->
 <div class="modal" id="modal">
   <div class="modal-content">
+    <h3>Add Book</h3>
+
     <form id="bookForm">
       <input id="title" placeholder="Title" required>
       <input id="author" placeholder="Author">
-      <input id="genres" placeholder="Genres">
       <input id="image" placeholder="Image URL">
       <textarea id="description" placeholder="Description"></textarea>
+
+      <div class="genre-picker" id="genrePicker"></div>
+
       <button>Save</button>
     </form>
   </div>
@@ -203,78 +218,23 @@ input, textarea {
 const BIN_ID="6a0fc1ebee5a733b12fc9522";
 const API_KEY="$2a$10$QvJnLiGvVrc6k6ds.TiRNegZHNuZd1RYpQDEb6OXRuoPRh3kuEtRC";
 
-let data, currentGenre="All";
+let data, currentGenre="All", selectedGenres=[];
 
-/* Theme */
-function toggleTheme(){
-  document.body.classList.toggle("dark");
-}
-
-/* Load */
+/* 🔄 SAFE LOAD */
 async function load(){
   const res=await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`,{
     headers:{"X-Master-Key":API_KEY}
   });
-  data=(await res.json()).record;
+
+  const json=await res.json();
+  data=json.record;
+
   renderGenres();
   renderBooks();
 }
 
-function renderGenres(){
-  genreBar.innerHTML=`<div class="genre ${currentGenre==='All'?'active':''}" onclick="setGenre('All')">All</div>`;
-  data.genres.forEach(g=>{
-    genreBar.innerHTML+=`<div class="genre" onclick="setGenre('${g}')">${g}</div>`;
-  });
-}
-
-function renderBooks(){
-  let list=data.books;
-
-  if(currentGenre!=="All")
-    list=list.filter(b=>b.genres.includes(currentGenre));
-
-  const search=searchInput.value.toLowerCase();
-  list=list.filter(b=>b.title.toLowerCase().includes(search));
-
-  bookList.innerHTML=list.map(b=>`
-    <div class="book">
-      <img src="${b.image}">
-      <h3>${b.title}</h3>
-      <div class="actions">
-        <a href="book.html?id=${b.id}">Open</a>
-      </div>
-    </div>
-  `).join("");
-}
-
-function setGenre(g){
-  currentGenre=g;
-  renderBooks();
-}
-
-searchInput.oninput=renderBooks;
-
-/* Modal */
-function openModal(){ modal.style.display="block"; }
-
-window.onclick=e=>{
-  if(e.target.id==="modal") modal.style.display="none";
-};
-
-bookForm.onsubmit=async e=>{
-  e.preventDefault();
-
-  const book={
-    id:Date.now(),
-    title:title.value,
-    author:author.value,
-    genres:genres.value.split(","),
-    image:image.value,
-    description:description.value
-  };
-
-  data.books.push(book);
-
+/* 🔄 SAFE SAVE */
+async function save(){
   await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`,{
     method:"PUT",
     headers:{
@@ -284,8 +244,93 @@ bookForm.onsubmit=async e=>{
     body:JSON.stringify(data)
   });
 
-  modal.style.display="none";
   load();
+}
+
+/* 🎨 GENRES */
+function renderGenres(){
+  genreBar.innerHTML=`<div class="genre ${currentGenre==='All'?'active':''}" onclick="setGenre('All')">All</div>`;
+
+  data.genres.forEach(g=>{
+    genreBar.innerHTML+=`<div class="genre ${currentGenre===g?'active':''}" onclick="setGenre('${g}')">${g}</div>`;
+  });
+}
+
+/* 📚 BOOKS */
+function renderBooks(){
+  let list=data.books;
+
+  if(currentGenre!=="All")
+    list=list.filter(b=>b.genres.includes(currentGenre));
+
+  const s=search.value.toLowerCase();
+  list=list.filter(b=>b.title.toLowerCase().includes(s));
+
+  bookList.innerHTML=list.map(b=>`
+    <div class="book">
+      <img src="${b.image}">
+      <h3>${b.title}</h3>
+      <p>${b.author}</p>
+      <div class="actions">
+        <a href="book.html?id=${b.id}">Read</a>
+      </div>
+    </div>
+  `).join("");
+}
+
+function setGenre(g){
+  currentGenre=g;
+  renderGenres();
+  renderBooks();
+}
+
+search.oninput=renderBooks;
+
+/* 🪟 MODAL */
+function openModal(){
+  modal.style.display="block";
+  renderPicker();
+}
+
+window.onclick=e=>{
+  if(e.target.id==="modal") modal.style.display="none";
+};
+
+/* 🎯 GENRE PICKER */
+function renderPicker(){
+  genrePicker.innerHTML=data.genres.map(g=>`
+    <div class="genre-chip ${selectedGenres.includes(g)?'selected':''}" onclick="toggleGenre('${g}')">${g}</div>
+  `).join("");
+}
+
+function toggleGenre(g){
+  if(selectedGenres.includes(g)){
+    selectedGenres=selectedGenres.filter(x=>x!==g);
+  } else {
+    selectedGenres.push(g);
+  }
+  renderPicker();
+}
+
+/* ➕ ADD BOOK */
+bookForm.onsubmit=async e=>{
+  e.preventDefault();
+
+  const book={
+    id:Date.now(),
+    title:title.value,
+    author:author.value,
+    image:image.value,
+    description:description.value,
+    genres:selectedGenres
+  };
+
+  data.books.push(book);
+  await save();
+
+  modal.style.display="none";
+  bookForm.reset();
+  selectedGenres=[];
 };
 
 load();
