@@ -15,7 +15,6 @@ body {
   font-family: 'EB Garamond', serif;
   background: radial-gradient(circle, #fdf6e3, #efe2c3);
   color: #2b2b2b;
-  overflow-x: hidden;
 }
 
 /* 📜 PAPER */
@@ -23,7 +22,7 @@ body {
   max-width: 1100px;
   margin: auto;
   padding: 20px;
-  background: rgba(255, 253, 245, 0.95);
+  background: rgba(255,253,245,0.95);
   box-shadow: 0 0 60px rgba(0,0,0,0.2);
   border-radius: 10px;
 }
@@ -33,8 +32,303 @@ h1 {
   text-align: center;
   font-family: 'Cinzel';
   letter-spacing: 3px;
-  margin-bottom: 5px;
 }
+
+/* 🔍 SEARCH */
+.search {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #c8b68a;
+  margin: 20px 0;
+  background: transparent;
+}
+
+/* 🎨 GENRES */
+.genre-bar {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  padding-bottom: 10px;
+}
+
+.genre {
+  font-size: 12px;
+  padding: 4px 10px;
+  border: 1px solid #c8b68a;
+  border-radius: 15px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.genre.active {
+  background: #2b2b2b;
+  color: white;
+}
+
+/* 📚 BOOKS */
+.books {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 20px;
+}
+
+.book {
+  background: white;
+  border: 1px solid #e0d3a8;
+  padding: 10px;
+  border-radius: 6px;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.book:hover {
+  transform: translateY(-6px) scale(1.03);
+}
+
+.book img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+/* ➕ BUTTON */
+.add-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #2b2b2b;
+  color: white;
+  width: 60px;
+  height: 60px;
+  font-size: 28px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+
+/* 🪟 MODAL */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background: #fffdf5;
+  max-width: 420px;
+  margin: 5% auto;
+  padding: 20px;
+  border-radius: 12px;
+  animation: pop 0.4s ease;
+}
+
+@keyframes pop {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* INPUT */
+input, textarea {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #c8b68a;
+  margin-bottom: 10px;
+  background: transparent;
+}
+
+/* 🎯 GENRE PICKER */
+.genre-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.genre-chip {
+  font-size: 12px;
+  padding: 4px 10px;
+  border: 1px solid #c8b68a;
+  border-radius: 15px;
+  cursor: pointer;
+}
+
+.genre-chip.selected {
+  background: black;
+  color: white;
+}
+
+/* 📱 MOBILE */
+@media(max-width:600px){
+  .book img { height: 180px; }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>📖 Libook</h1>
+
+  <input class="search" id="search" placeholder="Search by title or author...">
+
+  <div class="genre-bar" id="genreBar"></div>
+
+  <div class="books" id="bookList"></div>
+</div>
+
+<button class="add-btn" onclick="openModal()">+</button>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h3>Add Book</h3>
+
+    <form id="bookForm">
+      <input id="title" placeholder="Title" required>
+      <input id="author" placeholder="Author">
+      <input id="image" placeholder="Image URL">
+      <textarea id="description" placeholder="Description"></textarea>
+
+      <div class="genre-picker" id="genrePicker"></div>
+
+      <button>Save</button>
+    </form>
+  </div>
+</div>
+
+<script>
+const BIN_ID="6a0fc1ebee5a733b12fc9522";
+const API_KEY="$2a$10$QvJnLiGvVrc6k6ds.TiRNegZHNuZd1RYpQDEb6OXRuoPRh3kuEtRC";
+
+let data, currentGenre="All", selectedGenres=[];
+
+/* 🔄 LOAD */
+async function load(){
+  const res=await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`,{
+    headers:{"X-Master-Key":API_KEY}
+  });
+
+  data=(await res.json()).record;
+
+  renderGenres();
+  renderBooks();
+}
+
+/* 💾 SAVE */
+async function save(){
+  await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`,{
+    method:"PUT",
+    headers:{
+      "Content-Type":"application/json",
+      "X-Master-Key":API_KEY
+    },
+    body:JSON.stringify(data)
+  });
+
+  load();
+}
+
+/* 🎨 GENRES */
+function renderGenres(){
+  genreBar.innerHTML=`<div class="genre ${currentGenre==='All'?'active':''}" onclick="setGenre('All')">All</div>`;
+
+  data.genres.forEach(g=>{
+    genreBar.innerHTML+=`<div class="genre ${currentGenre===g?'active':''}" onclick="setGenre('${g}')">${g}</div>`;
+  });
+}
+
+/* 📚 BOOKS */
+function renderBooks(){
+  let list=data.books;
+
+  if(currentGenre!=="All")
+    list=list.filter(b=>b.genres.includes(currentGenre));
+
+  const s=search.value.toLowerCase();
+
+  list=list.filter(b =>
+    b.title.toLowerCase().includes(s) ||
+    b.author.toLowerCase().includes(s)
+  );
+
+  bookList.innerHTML=list.map(b=>`
+    <div class="book" onclick="openBook(${b.id})">
+      <img src="${b.image}">
+      <h3>${b.title}</h3>
+      <p>${b.author}</p>
+    </div>
+  `).join("");
+}
+
+/* 🔗 OPEN BOOK */
+function openBook(id){
+  window.location.href = `book.html?id=${id}`;
+}
+
+/* 🎯 FILTER */
+function setGenre(g){
+  currentGenre=g;
+  renderGenres();
+  renderBooks();
+}
+
+search.oninput=renderBooks;
+
+/* 🪟 MODAL */
+function openModal(){
+  modal.style.display="block";
+  renderPicker();
+}
+
+window.onclick=e=>{
+  if(e.target.id==="modal") modal.style.display="none";
+};
+
+/* 🎯 GENRE PICKER */
+function renderPicker(){
+  genrePicker.innerHTML=data.genres.map(g=>`
+    <div class="genre-chip ${selectedGenres.includes(g)?'selected':''}" onclick="toggleGenre('${g}')">${g}</div>
+  `).join("");
+}
+
+function toggleGenre(g){
+  if(selectedGenres.includes(g)){
+    selectedGenres=selectedGenres.filter(x=>x!==g);
+  } else {
+    selectedGenres.push(g);
+  }
+  renderPicker();
+}
+
+/* ➕ ADD */
+bookForm.onsubmit=async e=>{
+  e.preventDefault();
+
+  const book={
+    id:Date.now(),
+    title:title.value,
+    author:author.value,
+    image:image.value,
+    description:description.value,
+    genres:selectedGenres
+  };
+
+  data.books.push(book);
+
+  await save();
+
+  modal.style.display="none";
+  bookForm.reset();
+  selectedGenres=[];
+};
+
+load();
+</script>
+
+</body>
+</html>}
 
 .subtitle {
   text-align: center;
